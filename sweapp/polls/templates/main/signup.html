@@ -43,8 +43,20 @@
           />
         </label>
 
-        <button type="submit" id="loginBtn">Log in</button>
-        <a href="/signup">Don't have an account? Sign up!</a>
+        <label
+          >Confirm Password
+          <input
+            id="confirm_password"
+            name="confirm_password"
+            type="password"
+            placeholder="••••••••"
+            required
+            minlength="4"
+          />
+        </label>
+
+        <button type="submit" id="loginBtn">Create account</button>
+        <a href="/">Already have an account? Log in!</a>
         {% if messages %} {% for message in messages %}
         <p class="error" role="alert">{{ message }}</p>
         {% endfor %} {% endif %}

@@ -5,7 +5,7 @@ from . import views
 #     path("", views.index, name="index"),
 # ]
 
-# testing out views - ash
+
 urlpatterns = [
     path('', views.feed_view, name='feed'),
     path('feed/', views.feed_view, name='feed-page'),  # Added explicit feed URL

@@ -1,12 +1,11 @@
 from django.contrib import admin
 
-from django.urls import path, include
-
 # Register your models here.
-
-
-# just testing stuff out - ash
-urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('', include('polls.urls')),
-]
+# You can register models here to make them appear in Django admin
+# Example:
+# from .models import Profile, Group, Post, Message, Event
+# admin.site.register(Profile)
+# admin.site.register(Group)
+# admin.site.register(Post)
+# admin.site.register(Message)
+# admin.site.register(Event)

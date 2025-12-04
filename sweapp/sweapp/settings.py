@@ -29,12 +29,14 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'daphne',  # Must be first for WebSocket support
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'channels',  # WebSocket support
     'polls',
 ]
 
@@ -115,7 +117,40 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
+# Tell Django where to find static files in your apps
+STATICFILES_DIRS = [
+    BASE_DIR / 'polls' / 'static',
+]
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# ==============================================================================
+# CHANNELS CONFIGURATION (for WebSocket support)
+# ==============================================================================
+
+# Tell Django to use ASGI (Asynchronous Server Gateway Interface)
+# instead of WSGI (the traditional synchronous interface)
+ASGI_APPLICATION = 'sweapp.asgi.application'
+
+# Channel layers allow communication between different parts of your app
+# We use Redis as an in-memory message broker
+CHANNEL_LAYERS = {
+    'default': {
+        # Use in-memory channel layer for development (no Redis needed)
+        # This is simpler for learning but doesn't work across multiple servers
+        'BACKEND': 'channels.layers.InMemoryChannelLayer'
+    }
+}
+
+# NOTE: For production, you'd use Redis instead:
+# CHANNEL_LAYERS = {
+#     'default': {
+#         'BACKEND': 'channels_redis.core.RedisChannelLayer',
+#         'CONFIG': {
+#             "hosts": [('127.0.0.1', 6379)],
+#         },
+#     },
+# }

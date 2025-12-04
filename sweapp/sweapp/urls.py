@@ -19,8 +19,9 @@ from django.urls import include, path
 from polls import views
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
     path('', views.login_view, name='login'),  # Default page is login
+    path('signup/', views.sign_up, name='sign_up'),
     path('logout/', views.logout_view, name='logout'),  # Logout at root level
+    path('admin/', admin.site.urls),
     path('polls/', include('polls.urls')),  # Other pages under /polls/
 ]
