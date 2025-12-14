@@ -3,6 +3,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
+from .models import Event
 from django.utils import timezone
 from django.db import models
 from django.db.models import Q
@@ -86,6 +87,24 @@ def feed_view(request):
 
 def events_view(request):
     return render(request, 'main/events.html')
+
+def create_event_view(request):
+    if request.method == "POST":
+        title = request.POST.get("title")
+        date = request.POST.get("date")
+        description = request.POST.get("description")
+        location = request.POST.get("location")
+        
+        # Assigning the logged-in user as host
+        event = Event(
+            title=title,
+            date=date,
+            description=description,
+            hosted_by_user=request.user,  # assigning logged-in user as host
+        )
+        event.save()
+        return redirect('/polls/events/') # Redirect to events page after creation
+    return render(request, 'main/create_event.html') # Render form for GET request
 
 def messages_view(request):
     if not request.user.is_authenticated:

@@ -1,0 +1,150 @@
+:root {
+    --orange: #ff7b2f;
+    --pink: #ff5c8a;
+    --white: #ffffff;
+    --light-peach: #ffd5b9;
+    --text: #333;
+}
+
+/* Full page gradient background */
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background: linear-gradient(180deg, var(--orange), var(--pink));
+    background-attachment: fixed;
+    background-repeat: no-repeat;
+    background-size: cover;
+    font-family:Verdana, Geneva, Tahoma, sans-serif;
+}
+
+/* Header with Create Event button */
+.events-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1000px;
+    margin: 20px auto 10px;
+    padding: 0 20px;
+}
+
+.events-header h2 {
+    color: var(--white);
+    font-size: 28px;
+    font-weight: 700;
+}
+
+.create-event-btn {
+    background-color: var(--white);
+    color: var(--orange);
+    padding: 10px 18px;
+    border-radius: 8px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: 0.2s;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+}
+
+.create-event-btn:hover {
+    background-color: var(--orange);
+    color: var(--white);
+    transform: translateY(-2px);
+}
+
+/* Event container */
+.events-wrapper {
+    max-width: 1000px;
+    margin: 20px auto;
+    padding: 0 20px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+}
+
+/* Event card */
+.event-card {
+    background: var(--white);
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    flex: 350px; /* fixed width */
+    height: 200px;   /* fixed height */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: transform 0.2s, box-shadow 0.2s;
+    margin-top: 20px;
+    margin-bottom: 20px; 
+}
+
+.event-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+}
+
+/* Event text */
+.event-title {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--text);
+}
+
+.event-date {
+    font-size: 14px;
+    color: #555;
+}
+
+.event-description {
+    color: #444;
+    line-height: 1.5;
+    flex-grow: 1;
+}
+
+/* Event buttons */
+.event-btn {
+    background-color: var(--orange);
+    color: var(--white);
+    border: none;
+    padding: 10px 16px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.2s;
+}
+
+.event-btn:hover {
+    background-color: #ff9a5c;
+    transform: translateY(-2px);
+}
+
+/* Make modal background slightly blurred */
+.modal-backdrop.show {
+    backdrop-filter: blur(4px);
+    background-color: rgba(0,0,0,0.4);
+}
+
+/* Style inputs inside modal */
+.modal-content input,
+.modal-content textarea {
+    width: 100%;
+    padding: 10px;
+    margin-top: 6px;
+    margin-bottom: 12px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+}
+
+.modal-content label {
+    font-weight: 600;
+    color: var(--text);
+}
+
+.modal-footer .event-btn {
+    margin-right: 10px;
+}
+
