@@ -1,7 +1,21 @@
 from django.db import models
 from django.contrib.auth.models import User
 
-# Create your models here.
+
+class UserProfile(models.Model):
+    """Extended user profile with additional fields"""
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
+    bio = models.TextField(blank=True, default='')
+    major = models.CharField(max_length=100, blank=True, default='')
+    birthday = models.DateField(null=True, blank=True)
+    year = models.CharField(max_length=20, blank=True, default='')  # Freshman, Sophomore, Junior, Senior
+    workplace = models.CharField(max_length=200, blank=True, default='')
+    hometown = models.CharField(max_length=200, blank=True, default='')
+    profile_picture = models.ImageField(upload_to='profile_pics/', null=True, blank=True)
+    
+    def __str__(self):
+        return f"Profile of {self.user.username}"
+
 
 class Group(models.Model):
     """Represents a club or study group"""

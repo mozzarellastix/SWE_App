@@ -1,12 +1,10 @@
 from django.contrib import admin
-
-from django.urls import path, include
+from .models import UserProfile, Group, GroupMembership, Post, Message, Event
 
 # Register your models here.
-
-
-# just testing stuff out - ash
-urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('', include('polls.urls')),
-]
+admin.site.register(UserProfile)
+admin.site.register(Group)
+admin.site.register(GroupMembership)
+admin.site.register(Post)
+admin.site.register(Message)
+admin.site.register(Event)
