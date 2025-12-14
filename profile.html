@@ -1,0 +1,288 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Profile — Vaquero Social</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <style>
+    /* ----------------- THEME & BASE ----------------- */
+    :root{
+      --accent:#ff7b2f;
+      --accent-2:#ff5c8a;
+      --peach:#ffd5b9;
+      --muted:#6b6b73;
+      --card:#ffffff;
+      --maxw:1100px;
+    }
+    *{box-sizing:border-box;font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;}
+    body{ margin:0; background:linear-gradient(180deg,var(--accent),var(--accent-2)); min-height:100vh; display:flex; justify-content:center; padding:22px; }
+
+    /* ----------------- LAYOUT ----------------- */
+    .wrap{ width:100%; max-width:var(--maxw); background:rgba(255,255,255,0.96); border-radius:12px; padding:18px; box-shadow:0 10px 30px rgba(0,0,0,0.12); }
+    .grid{ display:grid; grid-template-columns: 1fr 300px; gap:18px; align-items:start; }
+    header.top{ display:flex; align-items:center; gap:12px; margin-bottom:12px; }
+    .back{ background:rgba(0,0,0,0.06); padding:8px; border-radius:8px; cursor:pointer; }
+    .top-right{ margin-left:auto; display:flex; gap:8px; align-items:center; }
+
+    /* ----------------- PROFILE CARD ----------------- */
+    .profile-card{ background: linear-gradient(180deg,#fff1ea,#fff7f4); border-radius:12px; padding:18px; display:flex; gap:18px; box-shadow: inset 0 -1px 0 rgba(0,0,0,0.02); }
+    .pfp{ width:120px; height:120px; border-radius:12px; background:#eee; border:4px solid rgba(255,255,255,0.6); flex-shrink:0; display:flex; align-items:center; justify-content:center; font-weight:700; color:#a64b2a; }
+    .pfp img{ width:100%; height:100%; object-fit:cover; border-radius:10px; }
+
+    .info{ flex:1; display:flex; flex-direction:column; gap:8px; }
+    .name-row{ display:flex; align-items:center; gap:12px; }
+    .name{ font-size:20px; font-weight:800; color:#222; }
+    .minor{ color:var(--muted); font-size:13px; }
+    .stats{ display:flex; gap:12px; color:var(--muted); font-weight:700; margin-top:6px; }
+    .bio{ color:#333; margin-top:6px; }
+
+    .action-row{ margin-top:8px; display:flex; gap:8px; }
+    .btn{ padding:10px 14px; border-radius:10px; border:0; cursor:pointer; font-weight:700; }
+    .btn.primary{ background:var(--accent); color:#fff; }
+    .btn.ghost{ background:transparent; border:1px solid rgba(0,0,0,0.06); color:#222; }
+
+    /* top friends row (small circles) */
+    .friends-row{ display:flex; gap:8px; align-items:center; margin-top:6px; }
+    .friend-small{ width:34px; height:34px; border-radius:50%; background:#ffd7bf; border:2px solid #e79b70; }
+
+    /* ----------------- RIGHT PANEL (Clubs & Events) ----------------- */
+    .right-panel{ display:flex; flex-direction:column; gap:12px; }
+    .panel{ background: #fff; border-radius:10px; padding:12px; box-shadow:0 8px 18px rgba(0,0,0,0.06); }
+    .panel h4{ margin:0 0 8px 0; font-size:15px; color:#222; }
+    .club-item{ display:flex; gap:8px; align-items:center; padding:8px; border-radius:8px; background:#fbf6f5; margin-bottom:8px; }
+    .club-item .icon{ width:36px;height:36px;border-radius:8px;background:#fff; border:1px solid #f0d6c4; }
+
+    /* ----------------- POSTS (masonry same as Home) ----------------- */
+    .posts-title{ font-size:22px; font-weight:800; margin:18px 0 8px 0; color:#222; }
+    .masonry{ column-count:2; column-gap:16px; }
+    .post{ display:inline-block; width:100%; margin:0 0 16px; break-inside:avoid; background:#fff; border-radius:10px; padding:10px; box-shadow:0 8px 18px rgba(0,0,0,0.05); }
+    .post .img{ width:100%; height:150px; background:#eee; border-radius:8px; }
+    .post .text{ margin-top:8px; color:#333; font-size:14px; }
+
+    /* ----------------- ABOUT FIELDS ----------------- */
+    .about-grid{ display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:8px; }
+    .about-item{ background:#fff; border-radius:8px; padding:8px; font-size:13px; border:1px solid #f0e2dc; color:#333; }
+
+    /* responsive */
+    @media (max-width:980px){
+      .grid{ grid-template-columns: 1fr; }
+      .masonry{ column-count:1; }
+      .top-right{ display:none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="top">
+      <div class="back" onclick="history.back()">←</div>
+      <div style="font-weight:800; font-size:18px;">Profile</div>
+      <div class="top-right">
+        <input id="miniSearch" placeholder="Search..." style="padding:8px 12px;border-radius:12px;border:0;" />
+        <div style="background:#fff;padding:8px;border-radius:8px;">🔔</div>
+        <div style="width:36px;height:36px;border-radius:50%;background:#fff"></div>
+      </div>
+    </header>
+
+    <div class="grid">
+      <!-- LEFT: profile + posts -->
+      <div>
+        <!-- Profile card -->
+        <section class="profile-card" id="profileCard">
+          <div class="pfp" id="pfpContainer" aria-hidden="true">
+            <!-- if JS inserts an image it will replace this inner text -->
+            <img id="pfpImg" src="" alt="" style="display:none;" />
+            <div id="pfpInitial" style="font-size:28px;">F</div>
+          </div>
+
+          <div class="info">
+            <div style="display:flex; flex-direction:column;">
+              <div class="name-row">
+                <div class="name" id="displayName">Avery Parker</div>
+                <div class="minor" id="majorText">· Computer Science</div>
+              </div>
+
+              <div class="stats" id="statsRow">
+                <div><span id="postsCount">0</span> Posts</div>
+                <div><span id="clubsCount">0</span> Clubs</div>
+                <div><span id="friendsCount">0</span> Friends</div>
+              </div>
+
+              <div class="bio" id="bioText">Short bio goes here — who they are and what they're into.</div>
+            </div>
+
+            <div class="friends-row" id="topFriendsRow" aria-label="Top friends">
+              <!-- small friend circles will be injected here -->
+            </div>
+
+            <div class="action-row">
+              <button class="btn primary" id="messageBtn">Message</button>
+              <button class="btn ghost" id="addFriendBtn">Add friend</button>
+              <button class="btn ghost" id="editProfileBtn">Edit</button>
+            </div>
+          </div>
+        </section>
+
+        <!-- About area -->
+        <div style="margin-top:12px;">
+          <div style="font-weight:800;">About</div>
+          <div class="about-grid" id="aboutGrid">
+            <!-- example fields -->
+            <div class="about-item"><strong>Birthday</strong><div id="birthday">April 12, 2003</div></div>
+            <div class="about-item"><strong>Year</strong><div id="year">Junior</div></div>
+            <div class="about-item"><strong>Workplace</strong><div id="workplace">Campus Lab</div></div>
+            <div class="about-item"><strong>Hometown</strong><div id="hometown">Edinburg, TX</div></div>
+          </div>
+        </div>
+
+        <!-- Posts -->
+        <div class="posts-title">Posts</div>
+        <section class="masonry" id="postsMasonry">
+          <!-- empty posts show here, JS will fill demo posts if none -->
+        </section>
+      </div>
+
+      <!-- RIGHT: clubs and events -->
+      <aside class="right-panel">
+        <div class="panel">
+          <h4>Clubs</h4>
+          <div id="clubsList">
+            <!-- clubs injected by JS -->
+          </div>
+          <div style="text-align:right;margin-top:8px;"><a href="#" style="color:var(--accent-2);text-decoration:none;font-weight:700;">See all</a></div>
+        </div>
+
+        <div class="panel">
+          <h4>Upcoming events</h4>
+          <div id="eventsList">
+            <!-- events injected by JS -->
+          </div>
+          <div style="text-align:right;margin-top:8px;"><a href="#" style="color:var(--accent-2);text-decoration:none;font-weight:700;">See all</a></div>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <script>
+    // ----------------- Demo / Integration logic -----------------
+    // This script reads `localStorage.user` (JSON) if available.
+    // If not found, it uses a demo profile. When your backend returns
+    // a user on login, store it with: localStorage.setItem('user', JSON.stringify(userObj));
+
+    const demoUser = {
+      id: 'u01',
+      name: 'Avery Parker',
+      handle: '@avery',
+      major: 'Computer Science',
+      year: 'Junior',
+      bio: "Software student who loves coffee, robotics, and late-night coding.",
+      birthday: 'April 12, 2003',
+      workplace: 'Campus Lab',
+      hometown: 'Edinburg, TX',
+      clubs: ['Coding Club', 'Cowboy Riders', 'Photography Society'],
+      topFriends: [
+        { name: 'Alex', avatar: '' },
+        { name: 'Keegan', avatar: '' },
+        { name: 'Maya', avatar: '' }
+      ],
+      posts: [
+        { type:'image', text:'Sunset over the quad', img:null },
+        { type:'text', text:'Study group Friday 6pm — library room B' },
+        { type:'image', text:'Mockup for the club event', img:null }
+      ]
+    };
+
+    // read stored user if exists
+    const stored = localStorage.getItem('user');
+    const user = stored ? JSON.parse(stored) : demoUser;
+
+    // utility
+    function byId(id){ return document.getElementById(id); }
+
+    // populate header info
+    byId('displayName').textContent = user.name || demoUser.name;
+    byId('majorText').textContent = '· ' + (user.major || '');
+    byId('bioText').textContent = user.bio || '';
+    byId('birthday').textContent = user.birthday || '';
+    byId('year').textContent = user.year || '';
+    byId('workplace').textContent = user.workplace || '';
+    byId('hometown').textContent = user.hometown || '';
+
+    // stats
+    byId('postsCount').textContent = user.posts ? user.posts.length : 0;
+    byId('clubsCount').textContent = user.clubs ? user.clubs.length : 0;
+    byId('friendsCount').textContent = user.topFriends ? user.topFriends.length : 0;
+
+    // top friends row
+    const topFriendsRow = byId('topFriendsRow');
+    (user.topFriends || []).forEach(f=>{
+      const d = document.createElement('div');
+      d.className = 'friend-small';
+      // if avatar exists, use it as background
+      if(f.avatar){
+        d.style.backgroundImage = `url(${f.avatar})`;
+        d.style.backgroundSize = 'cover';
+        d.title = f.name;
+      } else {
+        d.title = f.name;
+      }
+      topFriendsRow.appendChild(d);
+    });
+
+    // clubs & events lists
+    const clubsList = byId('clubsList');
+    (user.clubs || []).forEaSch(c=>{
+      const el = document.createElement('div');
+      el.className = 'club-item';
+      el.innerHTML = `<div class="icon"></div><div style="font-weight:700">${escapeHtml(c)}</div>`;
+      clubsList.appendChild(el);
+    });
+
+    const eventsList = byId('eventsList');
+    // simple demo events
+    const events = [
+      'Study Group — Fri 5pm',
+      'Fall Festival — Sat noon',
+      'Salsa Night — Fri 9pm'
+    ];
+    events.forEach(e=>{
+      const ev = document.createElement('div');
+      ev.className = 'club-item';
+      ev.innerHTML = `<div class="icon"></div><div>${escapeHtml(e)}</div>`;
+      eventsList.appendChild(ev);
+    });
+
+    // posts masonry
+    const masonry = byId('postsMasonry');
+    const posts = user.posts && user.posts.length ? user.posts : demoUser.posts;
+    posts.forEach(p=>{
+      const article = document.createElement('article');
+      article.className = 'post';
+      article.innerHTML = `
+        <div style="font-weight:700">${escapeHtml(user.name)}</div>
+        ${p.type === 'image' ? `<div class="img"></div>` : ''}
+        <div class="text">${escapeHtml(p.text || '')}</div>
+      `;
+      masonry.appendChild(article);
+    });
+
+    // Buttons
+    byId('messageBtn').addEventListener('click', ()=> alert('Open message (demo)'));
+    byId('addFriendBtn').addEventListener('click', ()=> alert('Friend request sent (demo)'));
+    byId('editProfileBtn').addEventListener('click', ()=> alert('Open profile editor (demo)'));
+
+    // If you want to support logout:
+    // create a small handler that clears localStorage and returns to login
+    function logoutAndReturn(){
+      localStorage.removeItem('user');
+      localStorage.removeItem('auth_token');
+      window.location.href = 'index.html'; // login
+    }
+
+    // Expose for debugging from the console:
+    window._vaquero = { user, logoutAndReturn };
+
+    // small helper
+    function escapeHtml(s){ return String(s||'').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;'); }
+  </script>
+</body>
+</html>

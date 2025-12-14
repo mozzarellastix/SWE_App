@@ -1,5 +1,138 @@
-{% extends 'main/base.html' %}
-{% block content %}
-<h2 class="text-center mb-4">Feed</h2>
-<p>This is the Feed page.</p>
-{% endblock %}
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Vaquero Social — Home</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link rel="stylesheet" href="{% static 'css/feed.css' %}" />
+</head>
+
+<body>
+
+<div class="container">
+
+  <!-- Header -->
+  <header class="appbar">
+    <div class="top-left">
+      <div class="back-btn" onclick="history.back()">←</div>
+      <div class="brand">🐴 Lasso</div>
+    </div>
+
+    <div class="search">
+      <input id="searchInput" placeholder="Search campus..." />
+    </div>
+
+    <div class="top-actions">
+      <div id="notifyBell" style="background:white;padding:8px;border-radius:8px;cursor:pointer;">🔔</div>
+      <div class="avatar"></div>
+    </div>
+  </header>
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <nav class="nav">
+      <a href="{% url 'feed' %}" class="active">🏠 Home</a>
+      <a href="{% url 'messages' %}">💬 Messages</a>
+      <a href="{% url 'events' %}">📅 Events</a>
+      <a href="{% url 'profile' %}">👤 Profile</a>
+    </nav>
+    <form method="post" action="{% url 'logout' %}" style="margin:0;">
+      {% csrf_token %}
+      <button type="submit" class="logout">⟲ Log out</button>
+    </form>
+  </aside>
+
+  <!-- Feed -->
+  <main class="feed-col">
+
+    <!-- tags -->
+    <div class="tags-row card" id="tagsRow">
+      <button class="tag active" data-topic="all">All</button>
+      <button class="tag" data-topic="arts">Arts</button>
+      <button class="tag" data-topic="tech">Tech</button>
+      <button class="tag" data-topic="sports">Sports</button>
+      <button class="tag" data-topic="science">Science</button>
+      <button class="tag" data-topic="food">Food</button>
+    </div>
+
+    <!-- post composer -->
+    <section class="card composer">
+      <div class="avatar"></div>
+      <form method="post" action="{% url 'feed' %}" style="display:flex;gap:12px;flex:1;align-items:center;">
+        {% csrf_token %}
+        <input name="content" id="quickPost" placeholder="Share something with campus…" required />
+        <button type="submit">Post</button>
+      </form>
+    </section>
+
+    <!-- Posts -->
+    <section id="postsMasonry" class="masonry">
+      {% for post in posts %}
+      <article class="post" data-topic="all">
+        <div class="post-head">
+          <div style="width:40px;height:40px;border-radius:50%;background:#ffd7bf"></div>
+          <div>
+            <strong>{{ post.created_by.username }}</strong>
+            <div class="meta">@{{ post.created_by.username }} · {{ post.timestamp|timesince }} ago</div>
+          </div>
+        </div>
+        <div class="text">{{ post.content }}</div>
+      </article>
+      {% empty %}
+      <article class="post">
+        <div class="post-head">
+          <div style="width:40px;height:40px;border-radius:50%;background:#ffd7bf"></div>
+          <div><strong>Welcome!</strong><div class="meta">Get started</div></div>
+        </div>
+        <div class="text">No posts yet. Be the first to share something!</div>
+      </article>
+      {% endfor %}
+    </section>
+
+  </main>
+
+  <!-- Right panel -->
+  <aside class="right">
+    <div class="card discover">
+      <div class="section-title">Upcoming Events</div>
+      {% if events %}
+        {% for event in events %}
+        <div class="item">{{ event.title }} — {{ event.date|date:"D g:ia" }}</div>
+        {% endfor %}
+      {% else %}
+        <div class="item">No upcoming events</div>
+      {% endif %}
+    </div>
+  </aside>
+
+</div>
+
+<script>
+  const tags = document.querySelectorAll('.tag');
+  const posts = Array.from(document.querySelectorAll('.post'));
+  const searchInput = document.getElementById('searchInput');
+
+  function setActiveTag(topic){
+    tags.forEach(t => t.classList.toggle('active', t.dataset.topic === topic));
+    filterPosts(topic, searchInput.value.trim());
+  }
+
+  function filterPosts(topic, search){
+    posts.forEach(p=>{
+      const matchesTopic = (topic === 'all') || (p.dataset.topic === topic);
+      const text = p.innerText.toLowerCase();
+      const matchesSearch = !search || text.includes(search.toLowerCase());
+      p.style.display = (matchesTopic && matchesSearch) ? 'inline-block' : 'none';
+    });
+  }
+
+  tags.forEach(t => t.addEventListener('click', () => setActiveTag(t.dataset.topic)));
+  searchInput.addEventListener('input', () => {
+    const activeTag = document.querySelector('.tag.active')?.dataset.topic || 'all';
+    filterPosts(activeTag, searchInput.value.trim());
+  });
+</script>
+
+</body>
+</html>
