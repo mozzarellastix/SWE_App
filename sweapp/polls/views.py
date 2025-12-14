@@ -63,33 +63,23 @@ def events_view(request):
     return render(request, 'main/events.html')
 
 def messages_view(request):
-    # Step 1: Make sure user is logged in
     if not request.user.is_authenticated:
         return redirect('login')
     
-    # Step 2: Get all users except the current user (these are potential chat partners)
     users = User.objects.exclude(id=request.user.id)
     
-    # Step 3: Initialize variables for the conversation
-    conversation_with = None  # The user we're chatting with
-    conversation_messages = []  # Messages in this conversation
+    conversation_with = None  
+    conversation_messages = []  
     
-    # Step 4: Check if user selected someone to chat with (via URL parameter)
     if 'user_id' in request.GET:
         try:
-            # Find the user they want to chat with
             conversation_with = User.objects.get(id=request.GET['user_id'])
             
-            # Step 5: Get ALL messages between current user and selected user
-            # Q() lets us do complex queries - we want messages where:
-            # - Current user sent to selected user, OR
-            # - Selected user sent to current user
             conversation_messages = Message.objects.filter(
                 Q(sender=request.user, receiver=conversation_with) |
                 Q(sender=conversation_with, receiver=request.user)
-            ).order_by('timestamp')  # Show oldest first
+            ).order_by('timestamp') 
             
-            # Step 6: Mark unread messages as read
             Message.objects.filter(
                 sender=conversation_with,
                 receiver=request.user,
@@ -97,9 +87,8 @@ def messages_view(request):
             ).update(is_read=True)
             
         except User.DoesNotExist:
-            pass  # If user doesn't exist, just ignore
+            pass 
     
-    # Step 7: Handle sending a new message (when form is submitted)
     if request.method == 'POST':
         receiver_id = request.POST.get('receiver_id')
         content = request.POST.get('content')
@@ -107,22 +96,21 @@ def messages_view(request):
         if receiver_id and content:
             try:
                 receiver = User.objects.get(id=receiver_id)
-                # Create a new message in the database
+
                 Message.objects.create(
                     sender=request.user,
                     receiver=receiver,
                     content=content
                 )
-                # Redirect back to the conversation to show the new message
+
                 return redirect(f'/polls/messages/?user_id={receiver_id}')
             except User.DoesNotExist:
                 pass
     
-    # Step 8: Pass data to the template
     context = {
-        'users': users,  # List of all users to chat with
-        'conversation_with': conversation_with,  # Current chat partner
-        'conversation_messages': conversation_messages,  # Chat history
+        'users': users,  
+        'conversation_with': conversation_with, 
+        'conversation_messages': conversation_messages,  
     }
     
     return render(request, 'main/messages.html', context)
@@ -130,7 +118,7 @@ def messages_view(request):
 def profile_view(request):
     return render(request, 'main/profile.html')
 
-def navbar(request): # do we need a view for navbar?
+def navbar(request): 
     return HttpResponse("This is the navbar component.")
 
 def logout_view(request):
@@ -156,6 +144,6 @@ def sign_up(request):
         
         user = User.objects.create_user(username=email, email=email, password=password)
         messages.success(request, 'Account created! You can now log in.')
-        return redirect('login')  # or wherever you want
+        return redirect('login')  
     
     return render(request, 'main/signup.html')
