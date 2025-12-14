@@ -1,0 +1,63 @@
+/* just messing around */
+
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background: linear-gradient(to top, #FFEDD5, #f39c7cff);
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh; /* Ensure it covers the full viewport height */;
+}
+
+.content-wrapper {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+/* just to fill in */
+body {
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+}
+
+
+/* for navbar style, using '!important' to go against the bootstrap */
+.navbar {
+    background-color: #006747 !important;
+    border-bottom: #F15A22 4px solid !important;
+    
+}
+
+.navbar-brand span {
+    color: #ffffff !important; /* white */
+}
+
+.navbar .btn-outline-warning {
+    color: #ffffff; /* white */
+    border-color: #ffffff; /* white */
+}
+
+.navbar .btn-outline-warning:hover {
+    background-color: #F15A22; /* orange */
+    color: #006747; /* dark green */
+}
+/* danger button is Events, cause thats where all the cool stuff happens idk */
+.navbar .btn-outline-danger {
+    color: #ffffff; /* white */
+    border-color: #ffffff; /* white */
+}
+
+.navbar .btn-outline-danger:hover {
+    background-color: #F15A22; /* orange */
+    color: #006747; /* dark green */
+}
+
+.navbar-brand img {
+    filter: brightness(0) invert(1); /* makes logo white */
+}
