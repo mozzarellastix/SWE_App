@@ -1,0 +1,102 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Edit Profile — Vaquero Social</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link rel="stylesheet" href="{% static 'css/common.css' %}" />
+  <link rel="stylesheet" href="{% static 'css/profile.css' %}" />
+</head>
+<body>
+  <div class="wrap">
+    <header class="top">
+      <a href="{% url 'profile' %}" class="back">←</a>
+      <div style="font-weight:800; font-size:18px; display:flex; align-items:center; gap:8px;">
+        <img src="https://images.vexels.com/media/users/3/252889/isolated/preview/02e0a9c8d1b16f3f23d96715d114168e-cowboy-with-lasso-and-horse-silhouette.png"
+             alt="Lasso Logo" width="24" height="24" class="d-inline-block align-text-top" />
+        Edit Profile
+      </div>
+    </header>
+
+    <div class="grid">
+      <div>
+        <section class="profile-card">
+          <form method="post" action="{% url 'edit_profile' %}" enctype="multipart/form-data" class="edit-form">
+            {% csrf_token %}
+            
+            <div class="form-section">
+              <h3>Profile Picture</h3>
+              <div class="pfp-upload">
+                {% if profile.profile_picture %}
+                  <img src="{{ profile.profile_picture.url }}" alt="Profile Picture" class="pfp-preview">
+                {% else %}
+                  <div class="pfp-preview">{{ user.username|slice:":1"|upper }}</div>
+                {% endif %}
+                <input type="file" name="profile_picture" accept="image/*" id="profile-pic-input">
+                <label for="profile-pic-input" class="upload-btn">Choose Photo</label>
+              </div>
+            </div>
+
+            <div class="form-section">
+              <h3>Basic Information</h3>
+              
+              <label>First Name
+                <input type="text" name="first_name" value="{{ user.first_name }}" placeholder="First Name">
+              </label>
+              
+              <label>Last Name
+                <input type="text" name="last_name" value="{{ user.last_name }}" placeholder="Last Name">
+              </label>
+              
+              <label>Bio
+                <textarea name="bio" rows="4" placeholder="Tell us about yourself...">{{ profile.bio }}</textarea>
+              </label>
+            </div>
+
+            <div class="form-section">
+              <h3>Academic Information</h3>
+              
+              <label>Major
+                <input type="text" name="major" value="{{ profile.major }}" placeholder="Computer Science">
+              </label>
+              
+              <label>Year
+                <select name="year">
+                  <option value="">Select Year</option>
+                  <option value="Freshman" {% if profile.year == 'Freshman' %}selected{% endif %}>Freshman</option>
+                  <option value="Sophomore" {% if profile.year == 'Sophomore' %}selected{% endif %}>Sophomore</option>
+                  <option value="Junior" {% if profile.year == 'Junior' %}selected{% endif %}>Junior</option>
+                  <option value="Senior" {% if profile.year == 'Senior' %}selected{% endif %}>Senior</option>
+                  <option value="Graduate" {% if profile.year == 'Graduate' %}selected{% endif %}>Graduate</option>
+                </select>
+              </label>
+            </div>
+
+            <div class="form-section">
+              <h3>Personal Information</h3>
+              
+              <label>Birthday
+                <input type="date" name="birthday" value="{% if profile.birthday %}{{ profile.birthday|date:'Y-m-d' }}{% endif %}">
+              </label>
+              
+              <label>Workplace
+                <input type="text" name="workplace" value="{{ profile.workplace }}" placeholder="Company or Organization">
+              </label>
+              
+              <label>Hometown
+                <input type="text" name="hometown" value="{{ profile.hometown }}" placeholder="City, State">
+              </label>
+            </div>
+
+            <div class="form-actions">
+              <button type="submit" class="btn primary">Save Changes</button>
+              <a href="{% url 'profile' %}" class="btn secondary">Cancel</a>
+            </div>
+          </form>
+        </section>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

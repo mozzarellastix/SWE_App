@@ -1,61 +1,14 @@
-:root {
-  --accent: #ff7b2f;
-  --accent-2: #ff5c8a;
-  --peach: #ffd5b9;
-  --muted: #6b6b73;
-  --card: #ffffff;
-  --maxw: 1200px;
-}
-
-* {
-  box-sizing: border-box;
-  font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
-}
-
-body {
-  margin: 0;
-  background: linear-gradient(180deg, var(--accent), var(--accent-2));
-  min-height: 100vh;
-  display: flex;
-  justify-content: center;
-  padding: 22px;
-}
-
-.wrap {
-  width: 100%;
-  max-width: var(--maxw);
-  background: rgba(255, 255, 255, 0.96);
-  border-radius: 12px;
+/* Messages-specific styles */
+.messages-main {
+  background: rgba(255,255,255,0.95);
   padding: 18px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
-}
-
-header.top {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 18px;
-}
-
-.back {
-  background: rgba(0, 0, 0, 0.06);
-  padding: 8px;
-  border-radius: 8px;
-  cursor: pointer;
-  text-decoration: none;
-  color: #222;
-  font-weight: 700;
-}
-
-.page-title {
-  font-weight: 800;
-  font-size: 20px;
-  color: #222;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.08);
 }
 
 .messages-container {
   display: grid;
-  grid-template-columns: 300px 1fr;
+  grid-template-columns: 280px 1fr;
   gap: 18px;
   height: 600px;
 }

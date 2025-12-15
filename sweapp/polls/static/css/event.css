@@ -1,150 +1,229 @@
-:root {
-    --orange: #ff7b2f;
-    --pink: #ff5c8a;
-    --white: #ffffff;
-    --light-peach: #ffd5b9;
-    --text: #333;
+/* Events-specific styles */
+.events-main {
+  background: rgba(255,255,255,0.95);
+  padding: 24px;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.08);
 }
 
-/* Full page gradient background */
-html, body {
-    height: 100%;
-    margin: 0;
-    padding: 0;
-}
-
-body {
-    background: linear-gradient(180deg, var(--orange), var(--pink));
-    background-attachment: fixed;
-    background-repeat: no-repeat;
-    background-size: cover;
-    font-family:Verdana, Geneva, Tahoma, sans-serif;
-}
-
-/* Header with Create Event button */
 .events-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    max-width: 1000px;
-    margin: 20px auto 10px;
-    padding: 0 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
 }
 
 .events-header h2 {
-    color: var(--white);
-    font-size: 28px;
-    font-weight: 700;
+  color: #222;
+  font-size: 24px;
+  font-weight: 800;
+  margin: 0;
 }
 
 .create-event-btn {
-    background-color: var(--white);
-    color: var(--orange);
-    padding: 10px 18px;
-    border-radius: 8px;
-    font-weight: 600;
-    text-decoration: none;
-    transition: 0.2s;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+  background: var(--accent);
+  color: white;
+  padding: 10px 18px;
+  border-radius: 10px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: 0.2s;
+  border: none;
+  cursor: pointer;
 }
 
 .create-event-btn:hover {
-    background-color: var(--orange);
-    color: var(--white);
-    transform: translateY(-2px);
+  background: var(--accent-2);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255,123,47,0.3);
 }
 
-/* Event container */
+/* Create Event Form */
+.create-event-form {
+  margin-bottom: 24px;
+}
+
+.form-card {
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+.form-card h3 {
+  margin-top: 0;
+  margin-bottom: 16px;
+  color: #222;
+  font-weight: 700;
+}
+
+.form-card label {
+  display: block;
+  margin-bottom: 12px;
+  font-weight: 600;
+  color: #555;
+}
+
+.form-card input,
+.form-card textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  margin-top: 4px;
+  font-family: inherit;
+}
+
+.form-card textarea {
+  resize: vertical;
+}
+
+.form-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+/* Event cards grid */
 .events-wrapper {
-    max-width: 1000px;
-    margin: 20px auto;
-    padding: 0 20px;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 20px;
-    justify-content: center;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 18px;
 }
 
-/* Event card */
 .event-card {
-    background: var(--white);
-    border-radius: 16px;
-    padding: 20px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-    flex: 350px; /* fixed width */
-    height: 200px;   /* fixed height */
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    transition: transform 0.2s, box-shadow 0.2s;
-    margin-top: 20px;
-    margin-bottom: 20px; 
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 200px;
+  transition: transform 0.2s, box-shadow 0.2s;
 }
 
 .event-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.12);
 }
 
-/* Event text */
 .event-title {
-    font-size: 22px;
-    font-weight: 700;
-    color: var(--text);
+  font-size: 20px;
+  font-weight: 700;
+  color: #222;
+  margin: 0 0 8px 0;
 }
 
 .event-date {
-    font-size: 14px;
-    color: #555;
+  font-size: 14px;
+  color: var(--muted);
+  margin: 0 0 12px 0;
+  font-weight: 600;
 }
 
 .event-description {
-    color: #444;
-    line-height: 1.5;
-    flex-grow: 1;
+  color: #444;
+  line-height: 1.5;
+  flex-grow: 1;
+  margin-bottom: 16px;
 }
 
-/* Event buttons */
 .event-btn {
-    background-color: var(--orange);
-    color: var(--white);
-    border: none;
-    padding: 10px 16px;
-    border-radius: 8px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background 0.2s, transform 0.2s;
+  background: var(--accent);
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.2s;
+  align-self: flex-start;
 }
 
 .event-btn:hover {
-    background-color: #ff9a5c;
-    transform: translateY(-2px);
+  background: var(--accent-2);
+  transform: translateY(-2px);
 }
 
-/* Make modal background slightly blurred */
-.modal-backdrop.show {
-    backdrop-filter: blur(4px);
-    background-color: rgba(0,0,0,0.4);
+.cancel-btn {
+  background: #ddd;
+  color: #333;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
 }
 
-/* Style inputs inside modal */
-.modal-content input,
-.modal-content textarea {
-    width: 100%;
-    padding: 10px;
-    margin-top: 6px;
-    margin-bottom: 12px;
-    border-radius: 6px;
-    border: 1px solid #ccc;
-    font-size: 14px;
+.cancel-btn:hover {
+  background: #ccc;
 }
 
-.modal-content label {
-    font-weight: 600;
-    color: var(--text);
+/* Event card header with host info */
+.event-header-info {
+  margin-bottom: 12px;
 }
 
-.modal-footer .event-btn {
-    margin-right: 10px;
+.event-host {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+
+
+.event-location {
+  font-size: 14px;
+  color: var(--muted);
+  margin: 4px 0 12px 0;
+}
+
+.event-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.rsvp-count {
+  font-size: 14px;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.event-btn.active {
+  background: #4caf50;
+}
+
+.event-btn.active:hover {
+  background: #45a049;
+}
+
+.event-btn-outline {
+  background: transparent;
+  color: var(--accent);
+  border: 2px solid var(--accent);
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.event-btn-outline:hover {
+  background: var(--accent);
+  color: white;
+}
+
+/* Responsive design */
+@media (max-width: 980px) {
+  .events-wrapper {
+    grid-template-columns: 1fr;
+  }
 }
 

@@ -46,7 +46,9 @@
         <button type="submit" id="loginBtn">Log in</button>
         <a href="/signup">Don't have an account? Sign up!</a>
         {% if messages %} {% for message in messages %}
+        {% if message.level_tag == 'error' %}
         <p class="error" role="alert">{{ message }}</p>
+        {% endif %}
         {% endfor %} {% endif %}
       </form>
     </main>

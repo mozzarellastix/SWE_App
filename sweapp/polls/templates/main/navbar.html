@@ -1,5 +1,16 @@
 {% comment %} Have no idea what im doing -ash ;) {% endcomment %}
 <!-- Navbar HTML using Bootstrap 5, however probably will change it up later -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Messages — Vaquero Social</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="{% static 'css/styles.css' %}" />
+</head>
+<body>
+
+
 <nav
   class="navbar navbar-expand-lg navbar-light bg-white border-bottom border-4 border-warning shadow-sm sticky-top"
 >
@@ -8,7 +19,6 @@
       class="navbar-brand d-flex align-items-center gap-2"
       href="{% url 'feed' %}"
     >
-      <!-- need to find a logo, placeholder -->
       <img
         src="https://images.vexels.com/media/users/3/252889/isolated/preview/02e0a9c8d1b16f3f23d96715d114168e-cowboy-with-lasso-and-horse-silhouette.png"
         alt="Lasso Logo"
@@ -56,3 +66,4 @@
     </div>
   </div>
 </nav>
+</body>

@@ -16,17 +16,13 @@ from polls.routing import websocket_urlpatterns
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'sweapp.settings')
 
-# Initialize Django ASGI application early to ensure settings are loaded
 django_asgi_app = get_asgi_application()
 
-# The ProtocolTypeRouter decides what to do based on the connection type
-# - HTTP requests go to Django (django_asgi_app)
-# - WebSocket requests go to our custom WebSocket routes
 application = ProtocolTypeRouter({
-    "http": django_asgi_app,  # Handle traditional HTTP requests
-    "websocket": AuthMiddlewareStack(  # Handle WebSocket connections
+    "http": django_asgi_app,
+    "websocket": AuthMiddlewareStack(
         URLRouter(
-            websocket_urlpatterns  # Routes defined in polls/routing.py
+            websocket_urlpatterns
         )
     ),
 })

@@ -13,7 +13,6 @@ def index(request):
     return HttpResponse("Hello world. You're at the polls index.")
 
 def login_view(request):
-    # If user is already logged in, redirect to feed
     if request.user.is_authenticated:
         return redirect('/polls/feed/')
     
@@ -23,11 +22,8 @@ def login_view(request):
         
         print(f"[LOGIN] Attempting login for email: {email}")
         
-        # Django's authenticate() uses username by default, but we can use email
-        # First, try to find user by email
         from django.contrib.auth.models import User
         try:
-            # Use filter().first() instead of get() to handle multiple users with same email
             user_obj = User.objects.filter(email=email).first()
             if not user_obj:
                 raise User.DoesNotExist
@@ -38,17 +34,14 @@ def login_view(request):
             messages.error(request, 'Invalid email or password.')
             return render(request, 'main/login.html')
         
-        # Authenticate user against database
         user = authenticate(request, username=username, password=password)
         print(f"[LOGIN] Authentication result: {user}")
         
         if user is not None:
-            # Login successful - log the user in
             login(request, user)
             print(f"[LOGIN] User logged in successfully. Authenticated: {request.user.is_authenticated}")
-            return redirect('/polls/feed/')  # Redirect to feed page after login
+            return redirect('/polls/feed/')
         else:
-            # Login failed
             print(f"[LOGIN] Authentication failed for user: {username}")
             messages.error(request, 'Invalid email or password.')
     
@@ -57,12 +50,10 @@ def login_view(request):
 def feed_view(request):
     print(f"[FEED] User: {request.user}, Authenticated: {request.user.is_authenticated}")
     
-    # Check if user is logged in
     if not request.user.is_authenticated:
         print(f"[FEED] User not authenticated, redirecting to login")
-        return redirect('/')  # Redirect to login page
+        return redirect('/')
     
-    # Handle post creation
     if request.method == 'POST':
         content = request.POST.get('content')
         if content:
@@ -73,20 +64,59 @@ def feed_view(request):
             )
             return redirect('feed')
     
-    # Get all posts
-    from .models import Post, Event
+    from .models import Post, Event, EventRSVP
     posts = Post.objects.all().order_by('-timestamp')[:50]
-    events = Event.objects.filter(date__gte=timezone.now()).order_by('date')[:3]
+    
+    hosted_events = Event.objects.filter(
+        date__gte=timezone.now(),
+        hosted_by_user=request.user
+    ).order_by('date')[:3]
+    
+    attending_event_ids = EventRSVP.objects.filter(
+        user=request.user,
+        rsvp_status='going'
+    ).values_list('event_id', flat=True)
+    
+    attending_events = Event.objects.filter(
+        date__gte=timezone.now(),
+        event_id__in=attending_event_ids
+    ).exclude(hosted_by_user=request.user).order_by('date')[:3]
+    
+    all_user_events = list(hosted_events) + list(attending_events)
+    all_user_events.sort(key=lambda e: e.date)
     
     print(f"[FEED] Rendering feed for user: {request.user.username}")
+    print(f"[FEED] Hosted events: {len(hosted_events)}, Attending events: {len(attending_events)}")
     context = {
         'posts': posts,
-        'events': events,
+        'events': all_user_events[:3],
     }
     return render(request, 'main/feed.html', context)
 
 def events_view(request):
-    return render(request, 'main/events.html')
+    from .models import EventRSVP
+    
+    events = Event.objects.all().order_by('date')
+    
+    user_rsvps = {}
+    if request.user.is_authenticated:
+        rsvps = EventRSVP.objects.filter(user=request.user)
+        user_rsvps = {rsvp.event_id: rsvp.rsvp_status for rsvp in rsvps}
+    
+    events_with_data = []
+    for event in events:
+        rsvp_count = EventRSVP.objects.filter(event=event, rsvp_status='going').count()
+        events_with_data.append({
+            'event': event,
+            'rsvp_count': rsvp_count,
+            'user_rsvp': user_rsvps.get(event.event_id)
+        })
+    
+    context = {
+        'events_with_data': events_with_data,
+        'events': events,
+    }
+    return render(request, 'main/events.html', context)
 
 def create_event_view(request):
     if request.method == "POST":
@@ -95,16 +125,15 @@ def create_event_view(request):
         description = request.POST.get("description")
         location = request.POST.get("location")
         
-        # Assigning the logged-in user as host
         event = Event(
             title=title,
             date=date,
             description=description,
-            hosted_by_user=request.user,  # assigning logged-in user as host
+            hosted_by_user=request.user,
         )
         event.save()
-        return redirect('/polls/events/') # Redirect to events page after creation
-    return render(request, 'main/create_event.html') # Render form for GET request
+        return redirect('/polls/events/')
+    return render(request, 'main/create_event.html')
 
 def messages_view(request):
     if not request.user.is_authenticated:
@@ -163,41 +192,70 @@ def profile_view(request):
     if not request.user.is_authenticated:
         return redirect('login')
     
-    from .models import Post, Group, Event, UserProfile
+    from .models import Post, Group, Event, UserProfile, Friendship, EventRSVP
     
-    # Get or create user profile
     profile, created = UserProfile.objects.get_or_create(user=request.user)
     
-    # Get user's posts
     user_posts = Post.objects.filter(created_by=request.user).order_by('-timestamp')
     
-    # Get user's groups
     user_groups = request.user.user_groups.all()
     
-    # Get upcoming events (user's or their groups')
-    upcoming_events = Event.objects.filter(
-        date__gte=timezone.now()
-    ).filter(
-        models.Q(hosted_by_user=request.user) | 
-        models.Q(hosted_by_group__in=user_groups)
+    friend_count = Friendship.objects.filter(
+        user=request.user,
+        status='accepted'
+    ).count()
+    
+    pending_requests = Friendship.objects.filter(
+        friend=request.user,
+        status='pending'
+    )
+    
+    hosted_events = Event.objects.filter(
+        date__gte=timezone.now(),
+        hosted_by_user=request.user
     ).order_by('date')[:5]
+    
+    print(f"[PROFILE] Hosted events count: {hosted_events.count()}")
+    for evt in hosted_events:
+        print(f"[PROFILE] Hosted: {evt.title} on {evt.date}")
+    
+    attending_event_ids = EventRSVP.objects.filter(
+        user=request.user,
+        rsvp_status='going'
+    ).values_list('event_id', flat=True)
+    
+    print(f"[PROFILE] Attending event IDs: {list(attending_event_ids)}")
+    
+    attending_events = Event.objects.filter(
+        date__gte=timezone.now(),
+        event_id__in=attending_event_ids
+    ).exclude(hosted_by_user=request.user).order_by('date')[:5]
+    
+    print(f"[PROFILE] Attending events count: {attending_events.count()}")
+    for evt in attending_events:
+        print(f"[PROFILE] Attending: {evt.title} on {evt.date}")
     
     context = {
         'user_posts': user_posts,
         'user_groups': user_groups,
-        'upcoming_events': upcoming_events,
+        'hosted_events': hosted_events,
+        'attending_events': attending_events,
         'profile': profile,
+        'friend_count': friend_count,
+        'pending_requests': pending_requests,
+        'is_own_profile': True,
     }
     return render(request, 'main/profile.html', context)
 
-def navbar(request): # do we need a view for navbar?
+def navbar(request):
     return HttpResponse("This is the navbar component.")
 
 def logout_view(request):
     print(f"[LOGOUT] User {request.user.username} logging out")
+    storage = messages.get_messages(request)
+    storage.used = True
     logout(request)
     print(f"[LOGOUT] User logged out. Authenticated: {request.user.is_authenticated}")
-    messages.success(request, 'You have been logged out successfully.')
     return redirect('/')
 
 def sign_up(request):
@@ -219,3 +277,156 @@ def sign_up(request):
         return redirect('login')  
     
     return render(request, 'main/signup.html')
+
+
+def delete_event(request, event_id):
+    """Delete an event (only by host)"""
+    if not request.user.is_authenticated:
+        return redirect('login')
+    
+    try:
+        event = Event.objects.get(event_id=event_id)
+        
+        if event.hosted_by_user == request.user:
+            event.delete()
+            messages.success(request, 'Event deleted successfully!')
+        else:
+            messages.error(request, 'You can only delete events you host!')
+    except Event.DoesNotExist:
+        messages.error(request, 'Event not found!')
+    
+    return redirect('events')
+
+def event_rsvp(request, event_id):
+    """Handle RSVP for an event"""
+    if not request.user.is_authenticated:
+        return redirect('login')
+    
+    from .models import EventRSVP
+    
+    try:
+        event = Event.objects.get(event_id=event_id)
+        
+        if request.method == 'POST':
+            status = request.POST.get('status', 'going')
+            
+            rsvp, created = EventRSVP.objects.get_or_create(
+                user=request.user,
+                event=event,
+                defaults={'rsvp_status': status}
+            )
+            
+            if not created:
+                rsvp.rsvp_status = status
+                rsvp.save()
+        
+    except Event.DoesNotExist:
+        messages.error(request, 'Event not found.')
+    
+    return redirect('events')
+
+
+def edit_profile(request):
+    """Edit user profile"""
+    if not request.user.is_authenticated:
+        return redirect('login')
+    
+    from .models import UserProfile
+    
+    profile, created = UserProfile.objects.get_or_create(user=request.user)
+    
+    if request.method == 'POST':
+        request.user.first_name = request.POST.get('first_name', '')
+        request.user.last_name = request.POST.get('last_name', '')
+        request.user.save()
+        
+        profile.bio = request.POST.get('bio', '')
+        profile.major = request.POST.get('major', '')
+        profile.year = request.POST.get('year', '')
+        profile.workplace = request.POST.get('workplace', '')
+        profile.hometown = request.POST.get('hometown', '')
+        
+        birthday = request.POST.get('birthday')
+        if birthday:
+            from datetime import datetime
+            try:
+                profile.birthday = datetime.strptime(birthday, '%Y-%m-%d').date()
+            except:
+                pass
+        
+        if 'profile_picture' in request.FILES:
+            profile.profile_picture = request.FILES['profile_picture']
+        
+        profile.save()
+        messages.success(request, 'Profile updated successfully!')
+        return redirect('profile')
+    
+    context = {
+        'profile': profile,
+    }
+    return render(request, 'main/edit_profile.html', context)
+
+
+def send_friend_request(request, user_id):
+    """Send a friend request to another user"""
+    if not request.user.is_authenticated:
+        return redirect('login')
+    
+    from .models import Friendship
+    
+    try:
+        friend = User.objects.get(id=user_id)
+        
+        if friend == request.user:
+            messages.error(request, "You can't send a friend request to yourself!")
+            return redirect('profile')
+        
+        existing = Friendship.objects.filter(
+            Q(user=request.user, friend=friend) |
+            Q(user=friend, friend=request.user)
+        ).first()
+        
+        if existing:
+            messages.info(request, 'Friend request already sent or you are already friends.')
+        else:
+            Friendship.objects.create(
+                user=request.user,
+                friend=friend,
+                status='pending'
+            )
+            messages.success(request, f'Friend request sent to {friend.username}!')
+        
+    except User.DoesNotExist:
+        messages.error(request, 'User not found.')
+    
+    return redirect(request.META.get('HTTP_REFERER', 'profile'))
+
+
+def respond_friend_request(request, friendship_id, action):
+    """Accept or reject a friend request"""
+    if not request.user.is_authenticated:
+        return redirect('login')
+    
+    from .models import Friendship
+    
+    try:
+        friendship = Friendship.objects.get(id=friendship_id, friend=request.user)
+        
+        if action == 'accept':
+            friendship.status = 'accepted'
+            friendship.save()
+            Friendship.objects.get_or_create(
+                user=request.user,
+                friend=friendship.user,
+                defaults={'status': 'accepted'}
+            )
+            messages.success(request, f'You are now friends with {friendship.user.username}!')
+        elif action == 'reject':
+            friendship.status = 'rejected'
+            friendship.save()
+            messages.info(request, 'Friend request rejected.')
+        
+    except Friendship.DoesNotExist:
+        messages.error(request, 'Friend request not found.')
+    
+    return redirect('profile')

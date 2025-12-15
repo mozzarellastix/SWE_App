@@ -5,15 +5,50 @@
   <meta charset="utf-8" />
   <title>Messages — Vaquero Social</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="{% static 'css/common.css' %}" />
   <link rel="stylesheet" href="{% static 'css/messages.css' %}" />
 </head>
 <body>
-  <div class="wrap">
-    <header class="top">
-      <a href="{% url 'feed' %}" class="back">←</a>
-      <div class="page-title">Messages</div>
-    </header>
 
+<div class="container">
+
+  <!-- Header -->
+  <header class="appbar">
+    <div class="top-left">
+      <div class="back-btn" onclick="history.back()">←</div>
+      <div class="brand">
+        <img src="https://images.vexels.com/media/users/3/252889/isolated/preview/02e0a9c8d1b16f3f23d96715d114168e-cowboy-with-lasso-and-horse-silhouette.png" 
+             alt="Logo (Cowboy holding a lasso)" style="width:32px; height:32px; border-radius:50%; object-fit:cover; margin-right:8px;" />
+        Lasso
+      </div>
+    </div>
+
+    <div class="search">
+      <input id="searchInput" placeholder="Search campus..." />
+    </div>
+
+    <div class="top-actions">
+      <div id="notifyBell" style="background:white;padding:8px;border-radius:8px;cursor:pointer;">🔔</div>
+      <div class="avatar"></div>
+    </div>
+  </header>
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <nav class="nav">
+      <a href="{% url 'feed' %}">🏠 Home</a>
+      <a href="{% url 'messages' %}" class="active">💬 Messages</a>
+      <a href="{% url 'events' %}">📅 Events</a>
+      <a href="{% url 'profile' %}">👤 Profile</a>
+    </nav>
+    <form method="post" action="{% url 'logout' %}" style="margin:0;">
+      {% csrf_token %}
+      <button type="submit" class="logout">⟲ Log out</button>
+    </form>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="messages-main">
     <div class="messages-container">
 
       <!-- LEFT SIDEBAR: List of users -->
@@ -78,7 +113,14 @@
         {% endif %}
       </div>
     </div>
-  </div>
+  </main>
+
+  <!-- Right sidebar (events or suggestions, optional) -->
+  <aside class="right-col">
+    <!-- Empty for now, can add suggestions later -->
+  </aside>
+
+</div>
 
 {% if conversation_with %}
 <script>

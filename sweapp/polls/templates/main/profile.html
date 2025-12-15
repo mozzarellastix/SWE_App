@@ -5,13 +5,23 @@
   <meta charset="utf-8" />
   <title>Profile — Vaquero Social</title>
   <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link rel="stylesheet" href="{% static 'css/common.css' %}" />
   <link rel="stylesheet" href="{% static 'css/profile.css' %}" />
 </head>
 <body>
   <div class="wrap">
     <header class="top">
       <a href="{% url 'feed' %}" class="back">←</a>
-      <div style="font-weight:800; font-size:18px;">Profile</div>
+      <div style="font-weight:800; font-size:18px; display:flex; align-items:center; gap:8px;">
+      <img
+        src="https://images.vexels.com/media/users/3/252889/isolated/preview/02e0a9c8d1b16f3f23d96715d114168e-cowboy-with-lasso-and-horse-silhouette.png"
+        alt="Lasso Logo"
+        width="80"
+        height="80"
+        class="d-inline-block align-text-top"
+      />
+        Profile
+      </div>
       <div class="top-right">
         <input placeholder="Search..." style="padding:8px 12px;border-radius:12px;border:0;" />
         <div style="background:#fff;padding:8px;border-radius:8px;">🔔</div>
@@ -21,7 +31,13 @@
     <div class="grid">
       <div>
         <section class="profile-card">
-          <div class="pfp">{{ user.username|slice:":1"|upper }}</div>
+          <div class="pfp">
+            {% if profile.profile_picture %}
+              <img src="{{ profile.profile_picture.url }}" alt="{{ user.username }}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">
+            {% else %}
+              {{ user.username|slice:":1"|upper }}
+            {% endif %}
+          </div>
           <div class="info">
             <div style="display:flex; flex-direction:column;">
               <div class="name-row">
@@ -31,15 +47,18 @@
               <div class="stats">
                 <div><span>{{ user_posts.count }}</span> Posts</div>
                 <div><span>{{ user_groups.count }}</span> Clubs</div>
-                <div><span>0</span> Friends</div>
+                <div><span>{{ friend_count }}</span> Friends</div>
               </div>
               <div class="bio">{{ profile.bio|default:"Welcome to my profile!" }}</div>
             </div>
             <div class="friends-row"></div>
             <div class="action-row">
-              <a href="{% url 'messages' %}" class="btn primary">Message</a>
-              <button class="btn ghost">Add friend</button>
-              <button class="btn ghost">Edit</button>
+              {% if is_own_profile %}
+                <a href="{% url 'edit_profile' %}" class="btn primary">Edit Profile</a>
+              {% else %}
+                <a href="{% url 'messages' %}" class="btn primary">Message</a>
+                <button class="btn ghost">Add Friend</button>
+              {% endif %}
             </div>
           </div>
         </section>
@@ -69,6 +88,33 @@
       </div>
 
       <aside class="right-panel">
+        {% if pending_requests %}
+        <div class="panel">
+          <h4>Friend Requests</h4>
+          <div>
+            {% for request in pending_requests %}
+            <div class="friend-request">
+              <div class="friend-avatar">
+                {% if request.user.profile.profile_picture %}
+                  <img src="{{ request.user.profile.profile_picture.url }}" alt="{{ request.user.username }}">
+                {% else %}
+                  {{ request.user.username|slice:":1"|upper }}
+                {% endif %}
+              </div>
+              <div style="flex:1;">
+                <strong>{{ request.user.username }}</strong>
+                <div style="font-size:12px;color:var(--muted);">wants to be friends</div>
+              </div>
+              <div class="friend-actions">
+                <a href="{% url 'respond_friend_request' request.id 'accept' %}" class="accept-btn">✓</a>
+                <a href="{% url 'respond_friend_request' request.id 'reject' %}" class="reject-btn">✕</a>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+        {% endif %}
+        
         <div class="panel">
           <h4>Clubs</h4>
           <div>
@@ -83,11 +129,25 @@
         <div class="panel">
           <h4>Upcoming events</h4>
           <div>
-            {% for event in upcoming_events %}
-            <div class="club-item"><div class="icon"></div><div>{{ event.title }} — {{ event.date|date:"D g:ia" }}</div></div>
-            {% empty %}
-            <div class="club-item"><div>No upcoming events</div></div>
+            {% for event in hosted_events %}
+            <div class="club-item">
+              <div style="display:flex;align-items:center;gap:8px;width:100%;">
+                <div style="flex:1;">{{ event.title }} — {{ event.date|date:"D g:ia" }}</div>
+                <div style="background:var(--accent);color:white;padding:2px 8px;border-radius:8px;font-size:11px;font-weight:700;">Host</div>
+              </div>
+            </div>
             {% endfor %}
+            {% for event in attending_events %}
+            <div class="club-item">
+              <div style="display:flex;align-items:center;gap:8px;width:100%;">
+                <div style="flex:1;">{{ event.title }} — {{ event.date|date:"D g:ia" }}</div>
+                <div style="background:#4CAF50;color:white;padding:2px 8px;border-radius:8px;font-size:11px;font-weight:700;">Attending</div>
+              </div>
+            </div>
+            {% endfor %}
+            {% if not hosted_events and not attending_events %}
+            <div class="club-item"><div>No upcoming events</div></div>
+            {% endif %}
           </div>
           <div style="text-align:right;margin-top:8px;">
             <a href="{% url 'events' %}" style="color:var(--accent-2);text-decoration:none;font-weight:700;">See all</a>
