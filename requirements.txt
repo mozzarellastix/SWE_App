@@ -2,3 +2,4 @@ channels
 daphne
 whitenoise
 django
+pillow
