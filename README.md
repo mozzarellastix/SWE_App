@@ -1,3 +1,19 @@
+# How to run the app
+
+activate the virtual env!!
+python -m venv venv
+
+venv\Scripts\activate (if on windows)
+
+pip install -r requirements.txt
+
+cd sweapp (make sure you're in the sweapp directory)
+
+python manage.py makemigrations
+python manage.py migrate
+
+daphne sweapp.asgi:application
+
 # Overview:
 
 _Lasso (placeholder) is a campus-only social app of UTRGV students that blends a customizable MySpace-style profile experience with smart matching for study partners, friendships, and clubs._
